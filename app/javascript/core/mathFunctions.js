@@ -147,23 +147,31 @@ wpd.cspline_interp = function(cs, x) {
     return a + b*t + c*t*t + d*t*t*t;
 }
 
-// Perform a Singular Value Decomposition (SVD) of a mxn matrix:
-// mat = [[...], [...], ...] (2D array, row-by-row)
-wpd.svd = function(mat) {
-
-    let result = numeric.svd(mat);
-
-    return {
-        U: result.U,
-        D: result.S,
-        V: result.V
-    };
-};
-
-
 // Homography matrix for perspective transformations based on pixel coordinates of corner points.
-wpd.calculateHomographyMatrix = function(orignalCorners, finalCorners) {
+wpd.calculateHomographyMatrix = function(originalCorners, finalCorners) {
+    let p1 = originalCorners;
+    let p2 = finalCorners;
+
+    // assemble 8x9 A in Ah = 0
+    let A = [
+        [-p1[0].x, -p1[0].y, -1, 0, 0, 0, p1[0].x*p2[0].x, p1[0].y*p2[0].x, p2[0].x],
+        [0, 0, 0, -p1[0].x, -p1[0].y, -1, p1[0].x*p2[0].y, p1[0].y*p2[0].y, p2[0].y],
+        [-p1[1].x, -p1[1].y, -1, 0, 0, 0, p1[1].x*p2[1].x, p1[1].y*p2[1].x, p2[1].x],
+        [0, 0, 0, -p1[1].x, -p1[1].y, -1, p1[1].x*p2[1].y, p1[1].y*p2[1].y, p2[1].y],
+        [-p1[2].x, -p1[2].y, -1, 0, 0, 0, p1[2].x*p2[2].x, p1[2].y*p2[2].x, p2[2].x],
+        [0, 0, 0, -p1[2].x, -p1[2].y, -1, p1[2].x*p2[2].y, p1[2].y*p2[2].y, p2[2].y],
+        [-p1[3].x, -p1[3].y, -1, 0, 0, 0, p1[3].x*p2[3].x, p1[3].y*p2[3].x, p2[3].x],
+        [0, 0, 0, -p1[3].x, -p1[3].y, -1, p1[3].x*p2[3].y, p1[3].y*p2[3].y, p2[3].y]
+    ];
+
+    // perform SVD
+
+    // numericjs SVD needs more rows than columns, so let's just do SVD of the transpose:
+    let svd_result = numeric.svd(numeric.transpose(A));
+    let V = numeric.transpose(svd_result.U);
+
     return {
-        H: null // homography matrix
+        H: null, // homography matrix
+        V: V
     };
 };

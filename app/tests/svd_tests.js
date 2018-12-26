@@ -18,9 +18,9 @@ QUnit.test("SVD of 3x3 matrix", function (assert) {
                               [-0.61106731,  0.54866225,  0.57058434],
                               [-0.65767746, -0.75304022,  0.01976841]];
 
-    let result = wpd.svd(mat);
+    let result = numeric.svd(mat);
 
     assert.equal(wpdtest.matCompare(result.U, expectedU, 1e-5), true, "U");
-    assert.equal(wpdtest.vecCompare(result.D, expectedD, 1e-5), true, "D");
+    assert.equal(wpdtest.vecCompare(result.S, expectedD, 1e-5), true, "D");
     assert.equal(wpdtest.matCompare(result.V, expectedVtranspose, 1e-5), true, "V");
 });
